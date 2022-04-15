@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from profiles_api import serializers
 from rest_framework import status, viewsets
 from profiles_api import models
+from rest_framework.authentication import TokenAuthentication
+from profiles_api import permissions
+from rest_framework import filters
 
 
 # Create your views here.
@@ -94,9 +97,19 @@ class HelloViewSet(viewsets.ViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """Handle creating and updating profiles"""
+    # This class has the same methods as ViewSet
+
     serializer_class = serializers.UserProfileSerializer
 
-    # Queries the object
+    # Queries the user objects
     queryset = models.UserProfile.objects.all()
 
-    # This class has the same methods as ViewSet
+    # Authentication
+    authentication_classes = (TokenAuthentication,)
+
+    # Permission classes
+    permission_classes = (permissions.UpdateOwnProfile,)
+
+    # Search filter
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'email',)
